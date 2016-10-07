@@ -193,7 +193,6 @@ serveIndex.html = function _html(req, res, files, next, dir, showUp, icons, path
 
     // read stylesheet
     fs.readFile(stylesheet, 'utf8', function (err, style) {
-      if (err) return next(err);
 
       // create locals for rendering
       var locals = {
@@ -201,7 +200,7 @@ serveIndex.html = function _html(req, res, files, next, dir, showUp, icons, path
         displayIcons: Boolean(icons),
         fileList: fileList,
         path: path,
-        style: style,
+        style: err ? ('//' + err.message) : style,
         viewName: view
       };
 
@@ -215,6 +214,7 @@ serveIndex.html = function _html(req, res, files, next, dir, showUp, icons, path
         res.end(buf);
       });
     });
+
   });
 };
 
