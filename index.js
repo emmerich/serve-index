@@ -192,32 +192,28 @@ serveIndex.html = function _html(req, res, files, next, dir, showUp, icons, path
     fileList.sort(fileSort);
 
     // read stylesheet
-    if (stylesheet !== 'none')
-      fs.readFile(stylesheet, 'utf8', function (err, style) {
+    fs.readFile(stylesheet, 'utf8', function (err, style) {
 
-        // do not throw an error for a css file...
-        if (err) return next(/*err*/);
+      // create locals for rendering
+      var locals = {
+        directory: dir,
+        displayIcons: Boolean(icons),
+        fileList: fileList,
+        path: path,
+        style: err ? ('//' + err.message) : style,
+        viewName: view
+      };
 
-        // create locals for rendering
-        var locals = {
-          directory: dir,
-          displayIcons: Boolean(icons),
-          fileList: fileList,
-          path: path,
-          style: style,
-          viewName: view
-        };
+      // render html
+      render(locals, function (err, body) {
+        if (err) return next(err);
 
-        // render html
-        render(locals, function (err, body) {
-          if (err) return next(err);
-
-          var buf = new Buffer(body, 'utf8');
-          res.setHeader('Content-Type', 'text/html; charset=utf-8');
-          res.setHeader('Content-Length', buf.length);
-          res.end(buf);
-        });
+        var buf = new Buffer(body, 'utf8');
+        res.setHeader('Content-Type', 'text/html; charset=utf-8');
+        res.setHeader('Content-Length', buf.length);
+        res.end(buf);
       });
+    });
 
   });
 };
